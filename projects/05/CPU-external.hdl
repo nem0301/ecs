@@ -1,7 +1,7 @@
 // This file is part of www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
-// File name: projects/05/CPU.hdl
+// File name: projects/05/CPU-external.hdl
 
 /**
  * The Hack CPU (Central Processing unit), consisting of an ALU,
@@ -25,7 +25,7 @@
  * than to the address resulting from executing the current instruction. 
  */
 
-CHIP CPU {
+CHIP CPU-external {
 
     IN  inM[16],         // M value input  (M = contents of RAM[A])
         instruction[16], // Instruction for execution
@@ -73,10 +73,10 @@ CHIP CPU {
     
 
 
-    DRegister(in=ALUout, load=d2, out=Dreg);
+    Register(in=ALUout, load=d2, out=Dreg);
 
     Mux16(a=instruction, b=ALUout, sel=instruction[15], out=inst);
-    ARegister(in=inst, load=d1, out=Areg, out[0..14]=addressM);
+    Register(in=inst, load=d1, out=Areg, out[0..14]=addressM);
 
     Mux16(a=Areg, b=inM, sel=a, out=AorM);
 
