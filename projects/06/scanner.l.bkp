@@ -1,0 +1,294 @@
+/* ====================================================================== */
+
+%{
+
+#define ACCEPT(x) \
+{\
+    if (iter == 0 )\
+    {\
+        printf("%i\t%s\t\"%s\"\n", source_line_no, (char*)x, yytext);\
+    }\
+    else if (iter == 1 && strcmp((char*)x, "VARIABLE") == 0)\
+    {\
+        int len = (int)strlen(yytext);\
+        char* str = (char*) malloc (len - 1);\
+        strcp(str, yytext, 1, len);\
+        \
+        if ( check(str, &label) == 0 && check (str, &var) == 0 )\
+        {\
+            push(source_line_no, str, &var);\
+            source_line_no--;\
+        }\
+        free(str);\
+    }\
+    else if ( iter == 2 )\
+    {\
+        if ( strcmp( (char*) x, "ADDR") == 0)\
+        {\
+            int i;\
+            int len = strlen(yytext);\
+            char* str = (char*) malloc (len -1);\
+            strcp(str, yytext, 1, len);\
+            i = atoi(str);\
+            printf("%s\n", str);\
+            itob(i);\
+            putchar('\n');\
+            free(str);\
+        }\
+        else\
+        {\
+        }\
+    }\
+    fflush(stdout); \
+}
+
+
+#define LABEL(x) \
+{ \
+    if (iter == 0)\
+    {\
+        int len = (int)strlen(yytext);\
+        char* str = (char*) malloc (len - 2);\
+        strcp(str, yytext, 1, len-1);\
+        \
+        push(source_line_no, str, &label);\
+        source_line_no--;\
+        free(str);\
+        fflush(stdout); \
+    }\
+} 
+
+#define LINE_COUNT() \
+{ \
+    int i=0; \
+    char c; \
+    while ( (c = *(yytext + i)) != '\0') \
+    { \
+        if (c == '\n'){ \
+            source_line_no++; \
+        } \
+        i++; \
+    } \
+} 
+
+int iter = 0;
+int source_line_no = 1;
+
+int var_addr = 16;
+
+char* predefined[23][2] = {
+    {"SP", "0"},
+    {"LCL", "1"}, 
+    {"ARG", "2"}, 
+    {"THIS", "3"}, 
+    {"THAT", "4"},
+    {"R0", "0"},
+    {"R1", "1"},
+    {"R2", "2"},
+    {"R3", "3"},
+    {"R4", "4"},
+    {"R5", "5"},
+    {"R6", "6"},
+    {"R7", "7"},
+    {"R8", "8"},
+    {"R9", "9"},
+    {"R10", "10"},
+    {"R11", "11"},
+    {"R12", "12"},
+    {"R13", "13"},
+    {"R14", "14"},
+    {"R15", "15"},
+    {"SCREEN", "16384"},
+    {"KBD", "24576"},
+};
+
+struct int_str {
+    int i;
+    char* str;
+    struct int_str* next;
+};
+
+struct int_str* label = NULL;
+struct int_str* var = NULL;
+
+void strcp (char* dst, char* src, int start, int end)
+{
+    int i, j;
+
+    for (j = 0, i = start; i < end; i++, j++)
+    {
+        dst[j] = src[i];
+    }
+}
+
+void push (int i, char* str, struct int_str** table)
+{
+    struct int_str* new = (struct int_str*) malloc (sizeof (struct int_str));
+    new->i = i;
+    new->str = (char*) malloc (strlen(str));
+    strcpy(new->str, str);
+    
+    if (*table == NULL)
+    {
+        *table = new;
+        new->next = NULL;
+    }
+    else
+    {
+        new->next = *table;
+        *table = new;
+    }
+}
+
+void print (struct int_str** table)
+{
+    struct int_str* sel = *table;
+    
+    while (sel != NULL)
+    {
+        printf("%d %s\n", sel->i, sel->str);
+        sel = sel->next;
+    }
+}
+
+int check (char* str, struct int_str** table)
+{
+    struct int_str* sel = *table;
+    
+    while (sel != NULL)
+    {
+        if (strcmp(str, sel->str) == 0)
+        {
+            return sel->i;
+        }
+        
+        sel = sel->next;
+    }
+    return 0;
+}
+
+void itob (int i)
+{
+    if ( i < 2 )
+    {
+        printf("%d", i);
+        return;
+    }
+    else
+    {
+        itob(i / 2);
+        printf("%d", i % 1);
+    }
+    
+}
+
+%}
+
+digit				[0-9]
+letter				[a-zA-Z]
+
+whitespace          [\t\r\n ]
+comments			"/*"([^*]|(\*[^/]))*"*/"|(\/\/.*\n) 
+
+%%
+
+"D"								ACCEPT("D");
+"A"								ACCEPT("A");
+"M"								ACCEPT("M");
+"!"								ACCEPT("NOT");
+"&"								ACCEPT("AND");
+"|"								ACCEPT("OR");
+"+"								ACCEPT("PLUS");
+"-"								ACCEPT("MINUS");
+"="								ACCEPT("ASSIGN");
+"0"                             ACCEPT("ZERO");
+"1"                             ACCEPT("ONE");
+";"                             ACCEPT("SEMICOLON");
+"JGT"                           ACCEPT("JGT");
+"JEQ"                           ACCEPT("JEQ");
+"JGE"                           ACCEPT("JGE");
+"JLT"                           ACCEPT("JLT");
+"JNE"                           ACCEPT("JNE");
+"JLE"                           ACCEPT("JLE");
+"JMP"                           ACCEPT("JMP");
+
+"@SP"                            ACCEPT("PREDEFINED");
+"@LCL"                           ACCEPT("PREDEFINED");
+"@ARG"                           ACCEPT("PREDEFINED");
+"@THIS"                          ACCEPT("PREDEFINED");
+"@THAT"                          ACCEPT("PREDEFINED");
+"@R0"                            ACCEPT("PREDEFINED");
+"@R1"                            ACCEPT("PREDEFINED");
+"@R2"                            ACCEPT("PREDEFINED");
+"@R3"                            ACCEPT("PREDEFINED");
+"@R4"                            ACCEPT("PREDEFINED");
+"@R5"                            ACCEPT("PREDEFINED");
+"@R6"                            ACCEPT("PREDEFINED");
+"@R7"                            ACCEPT("PREDEFINED");
+"@R8"                            ACCEPT("PREDEFINED");
+"@R9"                            ACCEPT("PREDEFINED");
+"@R10"                           ACCEPT("PREDEFINED");
+"@R11"                           ACCEPT("PREDEFINED");
+"@R12"                           ACCEPT("PREDEFINED");
+"@R13"                           ACCEPT("PREDEFINED");
+"@R14"                           ACCEPT("PREDEFINED");
+"@R15"                           ACCEPT("PREDEFINED");
+"@SCREEN"                        ACCEPT("PREDEFINED");
+"@KBD"                           ACCEPT("PREDEFINED");
+
+
+
+
+@{digit}{digit}*			    ACCEPT("ADDR");
+
+@([^\t\n\r ]*)                  ACCEPT("VARIABLE");
+"("([^\t\n\r ]*)")"             LABEL("LABEL");
+
+
+
+{comments}							LINE_COUNT();
+{whitespace}						LINE_COUNT();
+
+
+.					ACCEPT("UNDEFINED");
+
+%%
+
+/* ====================================================================== */
+#include <fcntl.h>
+
+
+int main(int argc, char *argv[])
+{
+    if(argc != 2) {
+        fprintf(stderr, "usage: scanner file\n");
+        exit(1);
+    }
+    yyin = fopen(argv[1], "r");
+    if(yyin == NULL) {
+        fprintf(stderr, "%s: %s\n", argv[1], strerror(errno));
+        exit(1);
+    }
+
+    yylex();
+    printf("label : \n");
+    print(&label);
+
+    
+    source_line_no = 1;
+    iter = 1;
+    yyin = fopen(argv[1], "r");
+    yylex();
+
+    printf("var : \n");
+    print(&var);
+
+    printf("-------------------------------\n");
+    source_line_no = 1;
+    iter = 2;
+    yyin = fopen(argv[1], "r");
+    yylex();
+
+    return 0;
+}
+
