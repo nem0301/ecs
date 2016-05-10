@@ -1,15 +1,15 @@
 # ======================================================================
 
-Assembler:	Assembler.c
-	gcc -O -o Assembler Assembler.c -lfl
+VMtranslator:	VMtranslator.c
+	gcc -O -o VMtranslator VMtranslator.c -lfl
 
-Assembler.c:	scanner.l
+VMtranslator.c:	scanner.l
 	flex scanner.l
-	mv lex.yy.c Assembler.c
+	mv lex.yy.c VMtranslator.c
 
 # ======================================================================
 
 clean:
-	@rm -rf .*~ *~ Assembler Assembler.c *.o *.ps *.pdf
+	@rm -rf .*~ *~ VMtranslator VMtranslator.c *.o *.ps *.pdf
 
 # ======================================================================
