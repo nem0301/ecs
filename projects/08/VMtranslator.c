@@ -535,7 +535,6 @@ char *yytext;
 /* ====================================================================== */
 #line 4 "scanner.l"
 #include "myString.h"
-#include "scope.h"
 
 #define C_ARITHMETIC    0
 #define C_PUSH          1
@@ -1042,6 +1041,7 @@ void accept(int token, char* lexeme)
         char* func;
         int ind;
         int cnt = 0;
+        
 
         str = (char*) malloc (strlen(lexeme) + 1);
         strcpy(str, lexeme);
@@ -1078,6 +1078,7 @@ void accept(int token, char* lexeme)
             free (scope);
         }
         scope = (char*) malloc (strlen(func) + 1);
+        
         strcpy(scope, func);
 
         
@@ -1116,11 +1117,6 @@ void accept(int token, char* lexeme)
         printf("@ret\n");                   //A = &ret
         printf("A=M\n");                    //A = M[A]; A = ret
         printf("0;JMP\n");                  //jump to A; jump to ret
-
-        if ( scope != NULL )
-        {
-            free(scope);
-        }
 
     }
     else if ( token == C_CALL )
@@ -1198,7 +1194,7 @@ void accept(int token, char* lexeme)
 
 }
 
-#line 1202 "lex.yy.c"
+#line 1198 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -1385,11 +1381,11 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 675 "scanner.l"
+#line 671 "scanner.l"
 
 
 
-#line 1393 "lex.yy.c"
+#line 1389 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -1474,72 +1470,72 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 678 "scanner.l"
+#line 674 "scanner.l"
 ACCEPT(C_PUSH);
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 679 "scanner.l"
+#line 675 "scanner.l"
 ACCEPT(C_POP);
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 680 "scanner.l"
+#line 676 "scanner.l"
 ACCEPT(C_IF);
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 681 "scanner.l"
+#line 677 "scanner.l"
 ACCEPT(C_GOTO);
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 682 "scanner.l"
+#line 678 "scanner.l"
 ACCEPT(C_LABEL);
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 683 "scanner.l"
+#line 679 "scanner.l"
 ACCEPT(C_FUNCTION);
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 684 "scanner.l"
+#line 680 "scanner.l"
 ACCEPT(C_CALL);
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 685 "scanner.l"
+#line 681 "scanner.l"
 ACCEPT(C_RETURN);
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 687 "scanner.l"
+#line 683 "scanner.l"
 ACCEPT(C_ARITHMETIC);
 	YY_BREAK
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 690 "scanner.l"
+#line 686 "scanner.l"
 LINE_COUNT();
 	YY_BREAK
 case 11:
 /* rule 11 can match eol */
 YY_RULE_SETUP
-#line 691 "scanner.l"
+#line 687 "scanner.l"
 LINE_COUNT();
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 693 "scanner.l"
+#line 689 "scanner.l"
 ACCEPT(C_UNDEFINED);
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 697 "scanner.l"
+#line 693 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1543 "lex.yy.c"
+#line 1539 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2537,7 +2533,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 697 "scanner.l"
+#line 693 "scanner.l"
 
 
 
@@ -2548,7 +2544,7 @@ void yyfree (void * ptr )
 
 void init ()
 {
-    printf("@256\n");
+    printf("@261\n");
     printf("D=A\n");
     printf("@SP\n");
     printf("M=D\n");
@@ -2660,9 +2656,6 @@ int main(int argc, char *argv[])
             {
                 int len = strlen(dirPath) + strlen(dent->d_name) + 1;
                 char* fullPath = (char*) malloc (len);
-                char* scopeName = (char*) malloc (strlen(dent->d_name) + 1);
-                
-                stringReplace(scopeName, dent->d_name, word, "");
 
 
                 sprintf(fullPath, "%s/%s", dirPath, dent->d_name);
@@ -2676,7 +2669,6 @@ int main(int argc, char *argv[])
                 //scanning and generation 
                 yylex();
 
-                free(scopeName);
 
             }
         }

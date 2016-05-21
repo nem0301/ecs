@@ -2,7 +2,6 @@
 
 %{
 #include "myString.h"
-#include "scope.h"
 
 #define C_ARITHMETIC    0
 #define C_PUSH          1
@@ -509,6 +508,7 @@ void accept(int token, char* lexeme)
         char* func;
         int ind;
         int cnt = 0;
+        
 
         str = (char*) malloc (strlen(lexeme) + 1);
         strcpy(str, lexeme);
@@ -545,6 +545,7 @@ void accept(int token, char* lexeme)
             free (scope);
         }
         scope = (char*) malloc (strlen(func) + 1);
+        
         strcpy(scope, func);
 
         
@@ -583,11 +584,6 @@ void accept(int token, char* lexeme)
         printf("@ret\n");                   //A = &ret
         printf("A=M\n");                    //A = M[A]; A = ret
         printf("0;JMP\n");                  //jump to A; jump to ret
-
-        if ( scope != NULL )
-        {
-            free(scope);
-        }
 
     }
     else if ( token == C_CALL )
@@ -703,7 +699,7 @@ letter				[a-zA-Z]
 
 void init ()
 {
-    printf("@256\n");
+    printf("@261\n");
     printf("D=A\n");
     printf("@SP\n");
     printf("M=D\n");
@@ -815,9 +811,6 @@ int main(int argc, char *argv[])
             {
                 int len = strlen(dirPath) + strlen(dent->d_name) + 1;
                 char* fullPath = (char*) malloc (len);
-                char* scopeName = (char*) malloc (strlen(dent->d_name) + 1);
-                
-                stringReplace(scopeName, dent->d_name, word, "");
 
 
                 sprintf(fullPath, "%s/%s", dirPath, dent->d_name);
@@ -831,7 +824,6 @@ int main(int argc, char *argv[])
                 //scanning and generation 
                 yylex();
 
-                free(scopeName);
 
             }
         }

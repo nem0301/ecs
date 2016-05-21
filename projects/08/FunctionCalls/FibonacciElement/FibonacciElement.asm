@@ -1,4 +1,4 @@
-@256
+@261
 D=A
 @SP
 M=D
@@ -226,7 +226,7 @@ M=D
 @ret
 A=M
 0;JMP
-(label:IF_FALSE)
+(Main.fibonacci:IF_FALSE)
 @0
 D=A
 @ARG
