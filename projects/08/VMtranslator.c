@@ -595,7 +595,7 @@ void untitle (int cmd, char* REG, int index)
 
     printf("%s\n", REG);
     printf("D=D+M\n");          
-    printf("@i\n");
+    printf("@R13\n");
     printf("M=D\n");            //i = *(@REG) + index;
 
     if ( cmd == C_POP )
@@ -605,13 +605,13 @@ void untitle (int cmd, char* REG, int index)
         printf("AM=M-1\n");
         printf("D=M\n");            //D = pop();
         
-        printf("@i\n");
+        printf("@R13\n");
         printf("A=M\n");
         printf("M=D\n");            //M[i] = D;
     }
     else 
     {
-        printf("@i\n");
+        printf("@R13\n");
         printf("A=M\n");
         printf("D=M\n");            //D = M[i];
 
@@ -720,7 +720,7 @@ void pushAndPop (int cmd, char* segment, int index)
     {
         printf("@%d\n", 5 + index);
         printf("D=A\n");
-        printf("@i\n");
+        printf("@R13\n");
         printf("M=D\n");
         
         if ( cmd == C_POP )
@@ -730,14 +730,38 @@ void pushAndPop (int cmd, char* segment, int index)
             printf("D=M\n");
             
             
-            printf("@i\n");
+            printf("@R13\n");
             printf("A=M\n");
             printf("M=D\n");
         }
         else 
         {
-            printf("@i\n");
+            printf("@R13\n");
             printf("A=M\n");
+            printf("D=M\n");
+
+            printf("@SP\n");
+            printf("A=M\n");
+            printf("M=D\n");
+            printf("@SP\n");
+            printf("M=M+1\n");
+        }
+    }
+    else
+    {
+        if ( cmd == C_POP )
+        {
+            printf("@SP\n");
+            printf("AM=M-1\n");
+            printf("D=M\n");
+            
+            
+            printf("@%s\n", segment);
+            printf("M=D\n");
+        }
+        else 
+        {
+            printf("@%s\n", segment);
             printf("D=M\n");
 
             printf("@SP\n");
@@ -756,7 +780,7 @@ void assignFromAddr (char* dst, char* addr, int i)
     printf("@%d\n", i);         //A = i
     printf("D=A\n");            //D = A; D = i
     printf("@%s\n", addr);      //A = &addr
-    printf("A=M-D\n");          //A = M[A] - D; A = addr - i;
+    printf("A=M-D\n");          //D = M[A] - D; A = addr - i;
     printf("D=M\n");            //D = M[A]; D = *(addr - i)
     
     printf("@%s\n", dst);       //A = &dst
@@ -792,50 +816,50 @@ void accept(int token, char* lexeme)
     {
         if ( strcmp(lexeme, "add") == 0 )
         {
-            pushAndPop(C_POP, "temp", 0);
-            pushAndPop(C_POP, "temp", 1);           
-            printf("@R5\n");
+            pushAndPop(C_POP, "R13", 0);
+            pushAndPop(C_POP, "R14", 1);           
+            printf("@R13\n");
             printf("M=D+M\n");
-            pushAndPop(C_PUSH, "temp", 0);
+            pushAndPop(C_PUSH, "R13", 0);
             
         }
         else if ( strcmp(lexeme, "sub") == 0 )
         {
-            pushAndPop(C_POP, "temp", 0);
-            pushAndPop(C_POP, "temp", 1);           
-            printf("@R5\n");
+            pushAndPop(C_POP, "R13", 0);
+            pushAndPop(C_POP, "R14", 1);           
+            printf("@R13\n");
             printf("M=D-M\n");
-            pushAndPop(C_PUSH, "temp", 0);
+            pushAndPop(C_PUSH, "R13", 0);
         }
         else if ( strcmp(lexeme, "and") == 0 )
         {
-            pushAndPop(C_POP, "temp", 0);
-            pushAndPop(C_POP, "temp", 1);           
-            printf("@R5\n");
+            pushAndPop(C_POP, "R13", 0);
+            pushAndPop(C_POP, "R14", 1);           
+            printf("@R13\n");
             printf("M=D&M\n");
-            pushAndPop(C_PUSH, "temp", 0);
+            pushAndPop(C_PUSH, "R13", 0);
         }
         else if ( strcmp(lexeme, "or") == 0 )
         {
-            pushAndPop(C_POP, "temp", 0);
-            pushAndPop(C_POP, "temp", 1);           
-            printf("@R5\n");
+            pushAndPop(C_POP, "R13", 0);
+            pushAndPop(C_POP, "R14", 1);           
+            printf("@R13\n");
             printf("M=D|M\n");
-            pushAndPop(C_PUSH, "temp", 0);
+            pushAndPop(C_PUSH, "R13", 0);
         }
         else if ( strcmp(lexeme, "not") == 0 )
         {
-            pushAndPop(C_POP, "temp", 0);
-            printf("@R5\n");
+            pushAndPop(C_POP, "R13", 0);
+            printf("@R13\n");
             printf("M=!M\n");
-            pushAndPop(C_PUSH, "temp", 0);
+            pushAndPop(C_PUSH, "R13", 0);
         }
         else if ( strcmp(lexeme, "neg") == 0 )
         {
-            pushAndPop(C_POP, "temp", 0);
-            printf("@R5\n");
+            pushAndPop(C_POP, "R13", 0);
+            printf("@R13\n");
             printf("M=-M\n");
-            pushAndPop(C_PUSH, "temp", 0);
+            pushAndPop(C_PUSH, "R13", 0);
         }
     }
     else if ( token == C_PUSH | token == C_POP )
@@ -876,9 +900,9 @@ void accept(int token, char* lexeme)
     { 
         if ( strcmp(lexeme, "eq") == 0 )
         {   
-            pushAndPop(C_POP, "temp", 0);
-            pushAndPop(C_POP, "temp", 1);           
-            printf("@R5\n");
+            pushAndPop(C_POP, "R13", 0);
+            pushAndPop(C_POP, "R14", 1);           
+            printf("@R13\n");
             printf("D=D-M\n");
             printf("@EQ%d\n", eq);
             printf("D;JEQ\n");
@@ -886,9 +910,9 @@ void accept(int token, char* lexeme)
 
             printf("@0\n");
             printf("D=A\n");
-            printf("@R5\n");
+            printf("@R13\n");
             printf("M=D\n");
-            pushAndPop(C_PUSH, "temp", 0);
+            pushAndPop(C_PUSH, "R13", 0);
 
             printf("@EQEND%d\n", eq);
             printf("0;JMP\n");
@@ -899,9 +923,9 @@ void accept(int token, char* lexeme)
             printf("@0\n");
             printf("D=A\n");
             printf("D=!D\n");
-            printf("@R5\n");
+            printf("@R13\n");
             printf("M=D\n");
-            pushAndPop(C_PUSH, "temp", 0);
+            pushAndPop(C_PUSH, "R13", 0);
 
             printf("(EQEND%d)\n", eq);
 
@@ -909,18 +933,18 @@ void accept(int token, char* lexeme)
         }
         else if ( strcmp(lexeme, "lt") == 0 )
         {   
-            pushAndPop(C_POP, "temp", 0);
-            pushAndPop(C_POP, "temp", 1);           
-            printf("@R5\n");
+            pushAndPop(C_POP, "R13", 0);
+            pushAndPop(C_POP, "R14", 1);           
+            printf("@R13\n");
             printf("D=D-M\n");
             printf("@LT%d\n", lt);
             printf("D;JLT\n");
 
             printf("@0\n");
             printf("D=A\n");
-            printf("@R5\n");
+            printf("@R13\n");
             printf("M=D\n");
-            pushAndPop(C_PUSH, "temp", 0);
+            pushAndPop(C_PUSH, "R13", 0);
 
             printf("@LTEND%d\n", lt);
             printf("0;JMP\n");
@@ -930,9 +954,9 @@ void accept(int token, char* lexeme)
             printf("@0\n");
             printf("D=A\n");
             printf("D=!D\n");
-            printf("@R5\n");
+            printf("@R13\n");
             printf("M=D\n");
-            pushAndPop(C_PUSH, "temp", 0);
+            pushAndPop(C_PUSH, "R13", 0);
 
             printf("(LTEND%d)\n", lt);
 
@@ -940,18 +964,18 @@ void accept(int token, char* lexeme)
         }
         else if ( strcmp(lexeme, "gt") == 0 )
         {   
-            pushAndPop(C_POP, "temp", 0);
-            pushAndPop(C_POP, "temp", 1);           
-            printf("@R5\n");
+            pushAndPop(C_POP, "R13", 0);
+            pushAndPop(C_POP, "R14", 1);           
+            printf("@R13\n");
             printf("D=D-M\n");
             printf("@GT%d\n", gt);
             printf("D;JGT\n");
 
             printf("@0\n");
             printf("D=A\n");
-            printf("@R5\n");
+            printf("@R13\n");
             printf("M=D\n");
-            pushAndPop(C_PUSH, "temp", 0);
+            pushAndPop(C_PUSH, "R13", 0);
 
             printf("@GTEND%d\n", gt);
             printf("0;JMP\n");
@@ -961,9 +985,9 @@ void accept(int token, char* lexeme)
             printf("@0\n");
             printf("D=A\n");
             printf("D=!D\n");
-            printf("@R5\n");
+            printf("@R13\n");
             printf("M=D\n");
-            pushAndPop(C_PUSH, "temp", 0);
+            pushAndPop(C_PUSH, "R13", 0);
 
             printf("(GTEND%d)\n", gt);
 
@@ -1090,14 +1114,21 @@ void accept(int token, char* lexeme)
     {
         printf("@LCL\n");                   //A = &LCL
         printf("D=M\n");                    //D = M[A]; D = LCL
-        printf("@frame\n");                 //A = &frame
+        printf("@R13\n");                 //A = &frame
         printf("M=D\n");                    //M[A] = D; frame = LCL
 
         //ret = *(frame - 5)
-        assignFromAddr("ret", "frame", 5);
+        assignFromAddr("R14", "R13", 5);
+
 
         //*arg = pop()
-        pushAndPop(C_POP, "argument", 0);
+        printf("@SP\n");
+        printf("AM=M-1\n");
+        printf("D=M\n");
+        printf("@ARG\n");
+        printf("A=M\n");
+        printf("M=D\n");
+        
 
         //sp = arg + 1
         printf("@ARG\n");                   //A = &ARG
@@ -1106,15 +1137,15 @@ void accept(int token, char* lexeme)
         printf("M=D+1\n");                  //M[A] = D + 1; SP = ARG + 1
         
         //that = *(frame - 1);
-        assignFromAddr("THAT", "frame", 1);
+        assignFromAddr("THAT", "R13", 1);
         //this = *(frame - 2);
-        assignFromAddr("THIS", "frame", 2);
+        assignFromAddr("THIS", "R13", 2);
         //arg = *(frame - 3);
-        assignFromAddr("ARG", "frame", 3);
+        assignFromAddr("ARG", "R13", 3);
         //lcl = *(frame - 4);
-        assignFromAddr("LCL", "frame", 4);
+        assignFromAddr("LCL", "R13", 4);
 
-        printf("@ret\n");                   //A = &ret
+        printf("@R14\n");                   //A = &ret
         printf("A=M\n");                    //A = M[A]; A = ret
         printf("0;JMP\n");                  //jump to A; jump to ret
 
@@ -1194,7 +1225,7 @@ void accept(int token, char* lexeme)
 
 }
 
-#line 1198 "lex.yy.c"
+#line 1229 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -1381,11 +1412,11 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 671 "scanner.l"
+#line 702 "scanner.l"
 
 
 
-#line 1389 "lex.yy.c"
+#line 1420 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -1470,72 +1501,72 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 674 "scanner.l"
+#line 705 "scanner.l"
 ACCEPT(C_PUSH);
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 675 "scanner.l"
+#line 706 "scanner.l"
 ACCEPT(C_POP);
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 676 "scanner.l"
+#line 707 "scanner.l"
 ACCEPT(C_IF);
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 677 "scanner.l"
+#line 708 "scanner.l"
 ACCEPT(C_GOTO);
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 678 "scanner.l"
+#line 709 "scanner.l"
 ACCEPT(C_LABEL);
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 679 "scanner.l"
+#line 710 "scanner.l"
 ACCEPT(C_FUNCTION);
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 680 "scanner.l"
+#line 711 "scanner.l"
 ACCEPT(C_CALL);
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 681 "scanner.l"
+#line 712 "scanner.l"
 ACCEPT(C_RETURN);
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 683 "scanner.l"
+#line 714 "scanner.l"
 ACCEPT(C_ARITHMETIC);
 	YY_BREAK
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 686 "scanner.l"
+#line 717 "scanner.l"
 LINE_COUNT();
 	YY_BREAK
 case 11:
 /* rule 11 can match eol */
 YY_RULE_SETUP
-#line 687 "scanner.l"
+#line 718 "scanner.l"
 LINE_COUNT();
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 689 "scanner.l"
+#line 720 "scanner.l"
 ACCEPT(C_UNDEFINED);
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 693 "scanner.l"
+#line 724 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1539 "lex.yy.c"
+#line 1570 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2533,7 +2564,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 693 "scanner.l"
+#line 724 "scanner.l"
 
 
 
