@@ -535,6 +535,7 @@ char *yytext;
 /* ====================================================================== */
 #line 4 "scanner.l"
 #include "myString.h"
+#include "static.h"
 
 #define C_ARITHMETIC    0
 #define C_PUSH          1
@@ -586,6 +587,9 @@ int gt = 0;
 int return_address = 0;
 
 char* scope;
+char* class;
+
+struct hash* table;
 
 void untitle (int cmd, char* REG, int index)
 {
@@ -637,7 +641,35 @@ void pushAndPop (int cmd, char* segment, int index)
     }
     else if ( strcmp(segment, "static") == 0 )
     {
-        printf("@%d\n", 16 + index);
+        struct stt* stte;
+        if ( strcmp (class, "Sys") == 0 )
+        {
+            if ( (stte = isInHashTable(table, class)) != NULL )
+            {
+            }
+            else
+            {
+                stte = insertStatic ( table, class, 16, 0);
+            }
+        }
+        else
+        {
+            
+            if ( (stte = isInHashTable(table, class)) != NULL )
+            {
+                if (index > stte->offset)
+                {
+                    stte->offset = index;
+                    table->offset = stte->base + stte->offset;
+                }
+            }
+            else
+            {
+                stte = insertStatic ( table, class, table->offset + 1, index);
+                table->offset = stte->base + index;
+            }
+        }
+
         
         if ( cmd == C_POP )
         {
@@ -645,10 +677,12 @@ void pushAndPop (int cmd, char* segment, int index)
             printf("AM=M-1\n");
             printf("D=M\n");
 
+            printf("@%d\n", stte->base + index);
             printf("M=D\n");
         }
         else 
         {
+            printf("@%d\n", stte->base + index);
             printf("D=M\n");
 
             printf("@SP\n");
@@ -1063,6 +1097,8 @@ void accept(int token, char* lexeme)
     else if ( token == C_FUNCTION )
     {   
         char* func;
+        char* temp;
+        struct stt* stte;
         int ind;
         int cnt = 0;
         
@@ -1089,7 +1125,8 @@ void accept(int token, char* lexeme)
             tok = strtok_r(NULL, " ", &ctx);
             cnt++;
         }
-
+        
+        
         printf("(%s)\n", func);
         
         while ( ind-- > 0)
@@ -1105,6 +1142,20 @@ void accept(int token, char* lexeme)
         
         strcpy(scope, func);
 
+        //static class
+        ctx = NULL;
+        
+        temp = (char*) malloc (strlen(func) + 1);
+        strcpy(temp, func);
+        
+        tok = strtok_r(temp, ".", &ctx);
+
+        if( class != NULL ) 
+        {
+            free (class);
+        }
+        class = (char*) malloc (strlen(tok) + 1);
+        strcpy(class, tok);
         
 
         free(str);
@@ -1225,7 +1276,7 @@ void accept(int token, char* lexeme)
 
 }
 
-#line 1229 "lex.yy.c"
+#line 1280 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -1412,11 +1463,11 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 702 "scanner.l"
+#line 753 "scanner.l"
 
 
 
-#line 1420 "lex.yy.c"
+#line 1471 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -1501,72 +1552,72 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 705 "scanner.l"
+#line 756 "scanner.l"
 ACCEPT(C_PUSH);
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 706 "scanner.l"
+#line 757 "scanner.l"
 ACCEPT(C_POP);
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 707 "scanner.l"
+#line 758 "scanner.l"
 ACCEPT(C_IF);
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 708 "scanner.l"
+#line 759 "scanner.l"
 ACCEPT(C_GOTO);
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 709 "scanner.l"
+#line 760 "scanner.l"
 ACCEPT(C_LABEL);
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 710 "scanner.l"
+#line 761 "scanner.l"
 ACCEPT(C_FUNCTION);
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 711 "scanner.l"
+#line 762 "scanner.l"
 ACCEPT(C_CALL);
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 712 "scanner.l"
+#line 763 "scanner.l"
 ACCEPT(C_RETURN);
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 714 "scanner.l"
+#line 765 "scanner.l"
 ACCEPT(C_ARITHMETIC);
 	YY_BREAK
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 717 "scanner.l"
+#line 768 "scanner.l"
 LINE_COUNT();
 	YY_BREAK
 case 11:
 /* rule 11 can match eol */
 YY_RULE_SETUP
-#line 718 "scanner.l"
+#line 769 "scanner.l"
 LINE_COUNT();
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 720 "scanner.l"
+#line 771 "scanner.l"
 ACCEPT(C_UNDEFINED);
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 724 "scanner.l"
+#line 775 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1570 "lex.yy.c"
+#line 1621 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2564,7 +2615,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 724 "scanner.l"
+#line 775 "scanner.l"
 
 
 
@@ -2617,6 +2668,8 @@ int main(int argc, char *argv[])
     }
     else
     {
+
+        table = createTable("static");
 
         // distinguish directory sign from only name (dir/ or dir)
         // and that make string that is directory full path having '/' char
@@ -2703,6 +2756,8 @@ int main(int argc, char *argv[])
 
             }
         }
+
+        //printTable(table);
 
         free(dirPath);
         free(str);

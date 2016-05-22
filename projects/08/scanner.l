@@ -2,6 +2,7 @@
 
 %{
 #include "myString.h"
+#include "static.h"
 
 #define C_ARITHMETIC    0
 #define C_PUSH          1
@@ -53,6 +54,9 @@ int gt = 0;
 int return_address = 0;
 
 char* scope;
+char* class;
+
+struct hash* table;
 
 void untitle (int cmd, char* REG, int index)
 {
@@ -104,7 +108,35 @@ void pushAndPop (int cmd, char* segment, int index)
     }
     else if ( strcmp(segment, "static") == 0 )
     {
-        printf("@%d\n", 16 + index);
+        struct stt* stte;
+        if ( strcmp (class, "Sys") == 0 )
+        {
+            if ( (stte = isInHashTable(table, class)) != NULL )
+            {
+            }
+            else
+            {
+                stte = insertStatic ( table, class, 16, 0);
+            }
+        }
+        else
+        {
+            
+            if ( (stte = isInHashTable(table, class)) != NULL )
+            {
+                if (index > stte->offset)
+                {
+                    stte->offset = index;
+                    table->offset = stte->base + stte->offset;
+                }
+            }
+            else
+            {
+                stte = insertStatic ( table, class, table->offset + 1, index);
+                table->offset = stte->base + index;
+            }
+        }
+
         
         if ( cmd == C_POP )
         {
@@ -112,10 +144,12 @@ void pushAndPop (int cmd, char* segment, int index)
             printf("AM=M-1\n");
             printf("D=M\n");
 
+            printf("@%d\n", stte->base + index);
             printf("M=D\n");
         }
         else 
         {
+            printf("@%d\n", stte->base + index);
             printf("D=M\n");
 
             printf("@SP\n");
@@ -530,6 +564,8 @@ void accept(int token, char* lexeme)
     else if ( token == C_FUNCTION )
     {   
         char* func;
+        char* temp;
+        struct stt* stte;
         int ind;
         int cnt = 0;
         
@@ -556,7 +592,8 @@ void accept(int token, char* lexeme)
             tok = strtok_r(NULL, " ", &ctx);
             cnt++;
         }
-
+        
+        
         printf("(%s)\n", func);
         
         while ( ind-- > 0)
@@ -572,6 +609,20 @@ void accept(int token, char* lexeme)
         
         strcpy(scope, func);
 
+        //static class
+        ctx = NULL;
+        
+        temp = (char*) malloc (strlen(func) + 1);
+        strcpy(temp, func);
+        
+        tok = strtok_r(temp, ".", &ctx);
+
+        if( class != NULL ) 
+        {
+            free (class);
+        }
+        class = (char*) malloc (strlen(tok) + 1);
+        strcpy(class, tok);
         
 
         free(str);
@@ -773,6 +824,8 @@ int main(int argc, char *argv[])
     else
     {
 
+        table = createTable("static");
+
         // distinguish directory sign from only name (dir/ or dir)
         // and that make string that is directory full path having '/' char
         if ( argv[1][strlen(argv[1])-1] == '/' ) 
@@ -858,6 +911,8 @@ int main(int argc, char *argv[])
 
             }
         }
+
+        //printTable(table);
 
         free(dirPath);
         free(str);

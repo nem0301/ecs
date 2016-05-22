@@ -1,8 +1,8 @@
 # ======================================================================
 
 
-VMtranslator:	VMtranslator.o myString.o scope.o
-	gcc -O -o VMtranslator VMtranslator.o myString.o scope.o -lfl
+VMtranslator:	VMtranslator.o myString.o static.o
+	gcc -O -o VMtranslator VMtranslator.o myString.o static.o -lfl
 
 VMtranslator.o:	VMtranslator.c myString.h
 	gcc -O -c VMtranslator.c -I.
@@ -10,8 +10,8 @@ VMtranslator.o:	VMtranslator.c myString.h
 myString.o: myString.c myString.h
 	gcc -O -c myString.c -I.
 
-scope.o: scope.c scope.h
-	gcc -O -c scope.c -I.
+static.o: static.c static.h
+	gcc -O -c static.c -I.
 
 VMtranslator.c:	scanner.l
 	flex scanner.l
