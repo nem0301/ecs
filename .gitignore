@@ -4,6 +4,7 @@
 *.tst
 *.jack
 *.vm
+*.swp
 !project/04/*/*.asm
 
 
