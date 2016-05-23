@@ -113,8 +113,9 @@ subroutineBody
 ;
 
 varDecs 
-    : VAR type varDecList SEMICOLON
+    : varDecs VAR type varDecList SEMICOLON
     | empty
+;
 
 varDecList 
     : varDecList COMMA varDec
@@ -147,8 +148,8 @@ letStatement
 ;
 
 ifStatement 
-    : LPAR expression RPAR LBRACE statements RBRACE
-    | LPAR expression RPAR LBRACE statements RBRACE ELSE LBRACE statements RBRACE
+    : IF LPAR expression RPAR LBRACE statements RBRACE
+    | IF LPAR expression RPAR LBRACE statements RBRACE ELSE LBRACE statements RBRACE
 ;
 
 whileStatement 

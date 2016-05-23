@@ -548,6 +548,7 @@ char *yytext;
 
 #define	ACCEPT(x) \
 { \
+  printf("%s\n", yytext);\
   yytext[yyleng] = '\0'; \
   lex = malloc(yyleng + 1); \
   strcpy(lex, yytext); \
@@ -577,7 +578,7 @@ void line_count()
 
 /* ====================================================================== */
 
-#line 581 "lex.yy.c"
+#line 582 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -764,10 +765,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 50 "scanner.l"
+#line 51 "scanner.l"
 
 
-#line 771 "lex.yy.c"
+#line 772 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -852,237 +853,237 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 52 "scanner.l"
+#line 53 "scanner.l"
 ACCEPT(CLASS);
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 53 "scanner.l"
+#line 54 "scanner.l"
 ACCEPT(CONSTRUCTOR);
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 54 "scanner.l"
+#line 55 "scanner.l"
 ACCEPT(FUNCTION);
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 55 "scanner.l"
+#line 56 "scanner.l"
 ACCEPT(METHOD);
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 56 "scanner.l"
+#line 57 "scanner.l"
 ACCEPT(FIELD);
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 57 "scanner.l"
+#line 58 "scanner.l"
 ACCEPT(STATIC);
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 58 "scanner.l"
+#line 59 "scanner.l"
 ACCEPT(VAR);
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 59 "scanner.l"
+#line 60 "scanner.l"
 ACCEPT(INT);
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 60 "scanner.l"
+#line 61 "scanner.l"
 ACCEPT(CHAR);
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 61 "scanner.l"
+#line 62 "scanner.l"
 ACCEPT(BOOLEAN);
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 62 "scanner.l"
+#line 63 "scanner.l"
 ACCEPT(VOID);
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 63 "scanner.l"
+#line 64 "scanner.l"
 ACCEPT(TRUE);
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 64 "scanner.l"
+#line 65 "scanner.l"
 ACCEPT(FALSE);
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 65 "scanner.l"
+#line 66 "scanner.l"
 ACCEPT(NULLVAL);
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 66 "scanner.l"
+#line 67 "scanner.l"
 ACCEPT(THIS);
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 67 "scanner.l"
+#line 68 "scanner.l"
 ACCEPT(LET);
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 68 "scanner.l"
+#line 69 "scanner.l"
 ACCEPT(DO);
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 69 "scanner.l"
+#line 70 "scanner.l"
 ACCEPT(IF);
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 70 "scanner.l"
+#line 71 "scanner.l"
 ACCEPT(ELSE);
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 71 "scanner.l"
+#line 72 "scanner.l"
 ACCEPT(WHILE);
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 72 "scanner.l"
+#line 73 "scanner.l"
 ACCEPT(RETURN);
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 74 "scanner.l"
+#line 75 "scanner.l"
 ACCEPT(LBRACE);
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 75 "scanner.l"
+#line 76 "scanner.l"
 ACCEPT(RBRACE);
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 76 "scanner.l"
+#line 77 "scanner.l"
 ACCEPT(LPAR);
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 77 "scanner.l"
+#line 78 "scanner.l"
 ACCEPT(RPAR);
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 78 "scanner.l"
+#line 79 "scanner.l"
 ACCEPT(LBRACKET);
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 79 "scanner.l"
+#line 80 "scanner.l"
 ACCEPT(RBRACKET);
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 80 "scanner.l"
+#line 81 "scanner.l"
 ACCEPT(DOT);
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 81 "scanner.l"
+#line 82 "scanner.l"
 ACCEPT(COMMA);
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 82 "scanner.l"
+#line 83 "scanner.l"
 ACCEPT(SEMICOLON);
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 83 "scanner.l"
+#line 84 "scanner.l"
 ACCEPT(PLUS);
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 84 "scanner.l"
+#line 85 "scanner.l"
 ACCEPT(MINUS);
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 85 "scanner.l"
+#line 86 "scanner.l"
 ACCEPT(MULTIPLY);
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 86 "scanner.l"
+#line 87 "scanner.l"
 ACCEPT(DIVIDE);
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 87 "scanner.l"
+#line 88 "scanner.l"
 ACCEPT(AND);
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 88 "scanner.l"
+#line 89 "scanner.l"
 ACCEPT(OR);
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 89 "scanner.l"
+#line 90 "scanner.l"
 ACCEPT(LT);
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 90 "scanner.l"
+#line 91 "scanner.l"
 ACCEPT(GT);
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 91 "scanner.l"
+#line 92 "scanner.l"
 ACCEPT(EQ);
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 92 "scanner.l"
+#line 93 "scanner.l"
 ACCEPT(NOT);
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 96 "scanner.l"
+#line 97 "scanner.l"
 ACCEPT(NUM);
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 97 "scanner.l"
+#line 98 "scanner.l"
 ACCEPT(STRING);
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 99 "scanner.l"
+#line 100 "scanner.l"
 ACCEPT(ID);
 	YY_BREAK
 case 44:
 /* rule 44 can match eol */
 YY_RULE_SETUP
-#line 101 "scanner.l"
+#line 102 "scanner.l"
 LINE_COUNT();
 	YY_BREAK
 case 45:
 /* rule 45 can match eol */
 YY_RULE_SETUP
-#line 102 "scanner.l"
+#line 103 "scanner.l"
 LINE_COUNT();
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 104 "scanner.l"
+#line 105 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1086 "lex.yy.c"
+#line 1087 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2080,7 +2081,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 104 "scanner.l"
+#line 105 "scanner.l"
 
 
 
