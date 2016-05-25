@@ -12,6 +12,8 @@
 extern FILE *yyin;
 extern char *yytext;
 extern int source_line_no;
+extern char* lex;
+
 
 /* ====================================================================== */
 
@@ -20,7 +22,6 @@ int yyerror(char *message);
 %}
 
 /* ====================================================================== */
-
 %start class
 
 %token CLASS CONSTRUCTOR FUNCTION METHOD FIELD STATIC
@@ -36,8 +37,10 @@ int yyerror(char *message);
 
 %%
 
-class 
+class
     : CLASS className LBRACE classVarDecList subroutineDecList RBRACE
+    {
+    }
 ;
 
 

@@ -75,13 +75,15 @@
 extern FILE *yyin;
 extern char *yytext;
 extern int source_line_no;
+extern char* lex;
+
 
 /* ====================================================================== */
 
 int yyerror(char *message);
 
 
-#line 85 "parser.tab.c" /* yacc.c:339  */
+#line 87 "parser.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -178,7 +180,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 182 "parser.tab.c" /* yacc.c:358  */
+#line 184 "parser.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -480,15 +482,15 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    40,    40,    45,    50,    51,    55,    56,    60,    61,
-      62,    63,    64,    68,    69,    73,    79,    80,    84,    88,
-      89,    90,    94,    98,    99,   103,   104,   108,   112,   116,
-     117,   121,   122,   126,   133,   134,   138,   139,   140,   141,
-     142,   146,   147,   151,   152,   156,   160,   164,   165,   169,
-     170,   174,   175,   176,   177,   178,   179,   180,   181,   185,
-     186,   187,   191,   192,   193,   198,   199,   200,   201,   202,
-     203,   204,   205,   206,   210,   211,   215,   216,   217,   218,
-     221
+       0,    41,    41,    48,    53,    54,    58,    59,    63,    64,
+      65,    66,    67,    71,    72,    76,    82,    83,    87,    91,
+      92,    93,    97,   101,   102,   106,   107,   111,   115,   119,
+     120,   124,   125,   129,   136,   137,   141,   142,   143,   144,
+     145,   149,   150,   154,   155,   159,   163,   167,   168,   172,
+     173,   177,   178,   179,   180,   181,   182,   183,   184,   188,
+     189,   190,   194,   195,   196,   201,   202,   203,   204,   205,
+     206,   207,   208,   209,   213,   214,   218,   219,   220,   221,
+     224
 };
 #endif
 
@@ -1386,8 +1388,15 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-      
-#line 1391 "parser.tab.c" /* yacc.c:1646  */
+        case 2:
+#line 42 "parser.y" /* yacc.c:1646  */
+    {
+    }
+#line 1396 "parser.tab.c" /* yacc.c:1646  */
+    break;
+
+
+#line 1400 "parser.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1615,7 +1624,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 235 "parser.y" /* yacc.c:1906  */
+#line 238 "parser.y" /* yacc.c:1906  */
 
 
 

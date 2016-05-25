@@ -9,7 +9,7 @@
 
 #define	ACCEPT(x) \
 { \
-  printf("%s\n", yytext);\
+  /*printf("%s\n", yytext);*/\
   yytext[yyleng] = '\0'; \
   lex = malloc(yyleng + 1); \
   strcpy(lex, yytext); \
