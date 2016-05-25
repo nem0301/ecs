@@ -147,7 +147,7 @@ statement
 
 letStatement 
     : LET varName EQ expression SEMICOLON
-    | LET varName LBRACE expression RBRACE EQ expression SEMICOLON
+    | LET varName LBRACKET expression RBRACKET EQ expression SEMICOLON
 ;
 
 ifStatement 
