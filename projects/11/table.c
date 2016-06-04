@@ -21,7 +21,7 @@
 #define CLASS_TYPE 4
 #define OBJECT_TYPE 5
 
-char* kind_list[] = {
+char *kind_list[] = {
     "class",
     "field",
     "static",
@@ -33,7 +33,7 @@ char* kind_list[] = {
     "",
 };
 
-char* type_list[] = {
+char *type_list[] = {
     "boolean",
     "void",
     "int",
@@ -45,17 +45,18 @@ char* type_list[] = {
 
 
 struct symbol {
-    char* name;
+    char *name;
     unsigned char kind;
     unsigned char type;
-    char* type_name;
-    struct symbol* next;
+    unsigned int num;
+    char *type_name;
+    struct symbol *next;
 };
 
 struct table {
     int offset;
-    char* name;
-    struct symbol* list[HASH_SIZE];
+    char *name;
+    struct symbol *list[HASH_SIZE];
 };
 
 struct table *global_table;
@@ -63,7 +64,7 @@ struct table *local_table;
 struct table *current_table;
 
 
-int hashing (char* name)
+int hashing (char *name)
 {
     int hashValue;
 
@@ -75,9 +76,9 @@ int hashing (char* name)
     return hashValue % HASH_SIZE;
 }
 
-struct table* createTable ( char* name ) 
+struct table *createTable ( char *name ) 
 {
-    struct table* tb;
+    struct table *tb;
     int i;
 
     if ( (tb = (struct table*) malloc ( sizeof (*tb))) == NULL )
@@ -94,11 +95,12 @@ struct table* createTable ( char* name )
     return tb;
 }
 
-struct symbol* insertTable (struct table* tb,
-                            char* name,
+struct symbol *insertTable (struct table *tb,
+                            char *name,
                             unsigned char kind,
                             unsigned char type,
-                            char* type_name)
+                            unsigned int num,
+                            char *type_name)
 {
     struct symbol *symbole = (struct symbol*) malloc (sizeof(struct symbol));
     int hashValue;
@@ -108,6 +110,7 @@ struct symbol* insertTable (struct table* tb,
     //strcpy(symbole->name, name);
     symbole->name = name;
     symbole->kind = kind;
+    symbole->num = num;
     symbole->type = type;
 
     if ( type == OBJECT_TYPE )
@@ -122,9 +125,9 @@ struct symbol* insertTable (struct table* tb,
     return symbole;
 }
 
-struct symbol* isInHashTable ( struct table* tb, char* name)
+struct symbol *isInHashTable ( struct table *tb, char *name)
 {
-    struct symbol* symbole;
+    struct symbol *symbole;
 
     for ( symbole = tb->list[hashing(name)]; symbole != NULL; symbole = symbole->next)
     {
@@ -136,34 +139,48 @@ struct symbol* isInHashTable ( struct table* tb, char* name)
     return NULL;
 }
 
-void printTable (struct table* tb)
+struct symbol *lookupTable (char* name)
 {
-    struct symbol* symbole;
+    struct symbol *symbole;
+    if ( (symbole = isInHashTable ( current_table, name )) != NULL )
+    {
+        return symbole;
+    }
+    else
+    {
+        return isInHashTable (global_table, name);
+    }
+}
+
+void printTable (struct table *tb)
+{
+    struct symbol *symbole;
     int i;
 
     printf("\t\t%s\n", tb->name);
 
-    printf("---------- ---------- ---------- ----------\n");
+    printf("---------- ---------- ---------- ---------- ----------\n");
 
     for ( i = 0; i < HASH_SIZE; i++ )
     {
         for (symbole = tb->list[i]; symbole != NULL; symbole = symbole->next )
         {
-            printf("%-10s %-10s %-10s %-10s\n", 
+            printf("%-10s %-10s %-10s %-10s %10d\n", 
                 symbole->name,
                 kind_list[symbole->kind],
                 type_list[symbole->type], 
-                symbole->type_name);
+                symbole->type_name,
+                symbole->num);
                                     
         }
     }
-    printf("---------- ---------- ---------- ----------\n");
+    printf("---------- ---------- ---------- ---------- ----------\n");
 }
 /*
 int main()
 {
-    struct table* g_table = createTable("static");
-    struct symbol* symbole;
+    struct table *g_table = createTable("static");
+    struct symbol *symbole;
     symbole = insertTable(g_table, "class1", 8, 2);
     symbole = insertTable(g_table, "class2", 8, 2);
     symbole = insertTable(g_table, "class3", 8, 2);

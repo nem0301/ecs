@@ -827,7 +827,7 @@ int main(int argc, char *argv[])
         table = createTable("static");
 
         // distinguish directory sign from only name (dir/ or dir)
-        // and that make string that is directory full path having '/' char
+        // and that make string to do not have 'char'
         if ( argv[1][strlen(argv[1])-1] == '/' ) 
         {
             dirPath = (char*) malloc (strlen(argv[1]));

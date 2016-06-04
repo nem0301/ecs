@@ -17,10 +17,11 @@ typedef struct t_type_struct {
 
 #define	ACCEPT(x) \
 { \
-  /*printf("%s\n", yytext);*/\
+  /*printf("%s\n", yytext)*/;\
   yytext[yyleng] = '\0'; \
-  lex = malloc(yyleng + 1); \
+  lex = (char*) malloc (yyleng + 1); \
   strcpy(lex, yytext); \
+  /*printf("%s\n", lex);*/\
   return(x); \
 }
 

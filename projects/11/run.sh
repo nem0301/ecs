@@ -1,1 +1,1 @@
-./parser ./Pong/Ball.jack
+./parser ./Seven/Main.jack
