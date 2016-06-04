@@ -21,6 +21,9 @@
 #define WORNG_TYPE_VAR 20
 #define WORNG_TYPE_FUNC 21
 
+#define MINUS_TYPE 0
+#define NOT_TYPE 1
+
 
 /* ====================================================================== */
 
@@ -28,6 +31,9 @@ extern FILE *yyin;
 extern char *yytext;
 extern int source_line_no;
 extern char *lex;
+
+extern char *kind_list[];
+extern char *type_list[];
 
 unsigned char position = CLASS_KIND;
 unsigned char type = -1;
@@ -38,6 +44,9 @@ unsigned int static_count = 0;
 unsigned int local_count = 0;
 unsigned int arg_count = 0;
 char *classname = NULL;
+
+int while_count = 0;
+int if_count = 0;
 
 extern struct table *global_table;
 extern struct table *local_table;
@@ -86,6 +95,7 @@ void printVar(char *name)
 %union {
     l_type lval;
     t_type tval;
+    int nval;
 }
 
 
@@ -102,6 +112,7 @@ void printVar(char *name)
 
 %type <lval> identifier numConstant stringConstant
 %type <tval> type subroutineKind
+%type <nval> prewhile preif
 
 %%
 
@@ -212,18 +223,15 @@ subroutineDec
         current_table = local_table;
         arg_count = 0;
         local_count = 0;
+        while_count = 0;
+        if_count = 0;
 
 
     }
-    LPAR parameters RPAR
-    {
-        isInHashTable(global_table, $<lval>3.lex)->num = arg_count;
-        
-
-    }
-    subroutineBody
+    LPAR parameters RPAR subroutineBody
     {
         //printTable(local_table);
+        isInHashTable(global_table, $<lval>3.lex)->num = local_count;
         current_table = global_table;
     }
 ;
@@ -240,13 +248,6 @@ subroutineKind
     | METHOD
     {
         $<tval>$.type = METHOD_KIND;
-    }
-;
-
-identifier 
-    : ID
-    {
-        $<lval>$.lex = lex;
     }
 ;
 
@@ -300,7 +301,7 @@ varDecList
     | identifier
     {
         insertTable(current_table, $<lval>1.lex, position, type, local_count, lexeme);
-        local_count = 1;
+        local_count++;
     }
 ;
 
@@ -326,31 +327,82 @@ letStatement
     {
     }
     EQ expression SEMICOLON
+    {
+        struct symbol* symbole = lookupTable($<lval>2.lex);
+        printf("pop %s %d\n", kind_list[symbole->kind], symbole->num);
+    }
 
     | LET identifier 
     {
     }
     LBRACKET expression RBRACKET EQ expression SEMICOLON
+    {
+    }
 ;
 
-ifStatement 
-    : IF LPAR expression RPAR LBRACE statements RBRACE
-    | IF LPAR expression RPAR LBRACE statements RBRACE ELSE LBRACE statements RBRACE
+preif
+    :IF LPAR expression RPAR 
+    {
+        $<nval>$ = if_count++;
+        printf("if-goto IF_TRUE%d\n", $<nval>$);
+        printf("goto IF_FALSE%d\n", $<nval>$);
+        printf("label IF_TRUE%d\n", $<nval>$);
+    }
 ;
+
+ifStatement
+    : preif LBRACE statements RBRACE
+    {
+        printf("goto IF_END%d\n", $<nval>1);
+        printf("label IF_FALSE%d\n", $<nval>1);
+    }
+    ELSE LBRACE statements RBRACE
+    {
+        printf("label IF_END%d\n", $<nval>1);
+    }
+    | preif LBRACE statements RBRACE
+    {
+        printf("goto IF_END%d\n", $<nval>1);
+        printf("label IF_FALSE%d\n", $<nval>1);
+        printf("label IF_END%d\n", $<nval>1);
+    }
+;
+
+prewhile :
+    WHILE 
+    {
+        $<nval>$ = while_count++;
+        printf("label WHILE_EXP%d\n", $<nval>$);
+    }
+
 
 whileStatement 
-    : WHILE LPAR expression RPAR LBRACE statements RBRACE
+    : prewhile LPAR expression RPAR 
+    {
+        printf("not\n");
+        printf("if-goto WHILE_END%d\n", $<nval>1);
+    }
+    LBRACE statements RBRACE
+    {
+        printf("goto WHILE_EXP%d\n", $<nval>1);
+        printf("label WHILE_END%d\n", $<nval>1);
+    }
 ;
 
 doStatement 
     : DO subroutineCall SEMICOLON
+    {
+        printf("pop temp 0\n");
+    }
 ;
 
 returnStatement
     : RETURN expression SEMICOLON
+    {
+        printf("return\n");
+    }
     | RETURN SEMICOLON
     {
-        printf("pop temp 0\n");
         printf("push constant 0\n");
         printf("return\n");
     }
@@ -372,10 +424,25 @@ term
     | stringConstant
     | keywordConstant
     | identifier
+    {
+        struct symbol* symbole = lookupTable($<lval>1.lex);
+        printf("push %s %d\n", kind_list[symbole->kind], symbole->num);        
+    }
     | identifier LBRACKET expression RBRACKET
     | subroutineCall
     | LPAR expression RPAR
     | unaryOp term
+    {
+        if ( $<tval>1.type == MINUS_TYPE )
+        {
+            printf("neg\n");
+        }
+        else if ( $<tval>1.type == NOT_TYPE )
+        {
+            printf("not\n");
+        }
+        
+    }
 ;
 
 
@@ -471,12 +538,25 @@ op
 
 unaryOp 
     : MINUS
+    {
+        $<tval>$.type = MINUS_TYPE;
+    }
     | NOT
+    {
+        $<tval>$.type = NOT_TYPE;
+    }
 ;
 
 keywordConstant 
     : TRUE
+    {
+        printf("push constant 0\n");
+        printf("not\n");
+    }
     | FALSE
+    {
+        printf("push constant 0\n");
+    }
     | NULLVAL
     | THIS
 ;
@@ -521,7 +601,6 @@ void run(char *fname)
     remove(vmName);
     fd = open (vmName, O_CREAT | O_WRONLY, 0664);
     dup2(fd, 1);
-    fprintf(stderr, "%d %s\n", fd, vmName);
 
     yyin = fopen(fname, "r"); 
     yyparse();

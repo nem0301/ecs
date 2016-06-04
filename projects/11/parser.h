@@ -96,12 +96,13 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 86 "parser.y" /* yacc.c:1909  */
+#line 95 "parser.y" /* yacc.c:1909  */
 
     l_type lval;
     t_type tval;
+    int nval;
 
-#line 105 "parser.tab.h" /* yacc.c:1909  */
+#line 106 "parser.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
