@@ -368,8 +368,18 @@ letStatement
     | LET identifier 
     {
     }
-    LBRACKET expression RBRACKET EQ expression SEMICOLON
+    LBRACKET expression RBRACKET 
     {
+        struct symbol* symbole = lookupTable($<lval>2.lex);
+        printf("push %s %d\n", kind_list[symbole->kind], symbole->num);
+        printf("add\n");
+    }
+    EQ expression SEMICOLON
+    {
+        printf("pop temp 0\n");
+        printf("pop pointer 1\n");
+        printf("push temp 0\n");
+        printf("pop that 0\n");
     }
 ;
 
@@ -453,6 +463,16 @@ term
         printf("push constant %s\n", $<lval>1.lex);
     }
     | stringConstant
+    {
+        int i, len = (int)strlen($<lval>1.lex) - 2; 
+        printf("push constant %d\n", len);
+        printf("call String.new 1\n");
+        for (i = 1; i <= len; i++)
+        {
+            printf("push constant %d\n", (int)$<lval>1.lex[i]);
+            printf("call String.appendChar 2\n");
+        }
+    }
     | keywordConstant
     | identifier
     {
@@ -460,6 +480,13 @@ term
         printf("push %s %d\n", kind_list[symbole->kind], symbole->num);        
     }
     | identifier LBRACKET expression RBRACKET
+    {
+        struct symbol* symbole = lookupTable($<lval>1.lex);
+        printf("push %s %d\n", kind_list[symbole->kind], symbole->num);        
+        printf("add\n");
+        printf("pop pointer 1\n");
+        printf("push that 0\n");
+    }
     | subroutineCall
     | LPAR expression RPAR
     | unaryOp term
