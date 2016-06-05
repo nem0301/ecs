@@ -35,6 +35,7 @@ extern char *lex;
 extern char *kind_list[];
 extern char *type_list[];
 
+unsigned char subroutine;
 unsigned char position = CLASS_KIND;
 unsigned char type = -1;
 char *lexeme;
@@ -111,7 +112,7 @@ void printVar(char *name)
 %token NUM STRING ID
 
 %type <lval> identifier numConstant stringConstant
-%type <tval> type subroutineKind
+%type <tval> type
 %type <nval> prewhile preif
 
 %%
@@ -199,14 +200,31 @@ type
 identifierList
     : identifierList COMMA identifier
     {
-        insertTable(current_table, $<lval>3.lex, position, type, field_count, lexeme);
-        field_count++;
+        int count;
+        if (position == FIELD_KIND)
+        {
+            count = field_count++;
+        }
+        else if (position == STATIC_KIND)
+        {
+            count = static_count++;
+        }
+        
+        insertTable(current_table, $<lval>3.lex, position, type, count, lexeme);
     }
     | identifier
     {
+        int count;
+        if (position == FIELD_KIND)
+        {
+            count = field_count++;
+        }
+        else if (position == STATIC_KIND)
+        {
+            count = static_count++;
+        }
         
-        insertTable(current_table, $<lval>1.lex, position, type, field_count, lexeme);
-        field_count = 1;
+        insertTable(current_table, $<lval>1.lex, position, type, count, lexeme);
     }
 ;
 
@@ -226,9 +244,11 @@ subroutineDec
         while_count = 0;
         if_count = 0;
 
-
     }
-    LPAR parameters RPAR subroutineBody
+    LPAR parameters RPAR 
+    {
+    }
+    subroutineBody
     {
         //printTable(local_table);
         isInHashTable(global_table, $<lval>3.lex)->num = local_count;
@@ -239,15 +259,15 @@ subroutineDec
 subroutineKind 
     : CONSTRUCTOR
     {
-        $<tval>$.type = CONSTRUCTOR_KIND;
+        subroutine = CONSTRUCTOR_KIND;
     }
     | FUNCTION
     {
-        $<tval>$.type = FUNCTION_KIND;
+        subroutine = FUNCTION_KIND;
     }
     | METHOD
     {
-        $<tval>$.type = METHOD_KIND;
+        subroutine = METHOD_KIND;
     }
 ;
 
@@ -278,7 +298,20 @@ subroutineBody :
     }
     LBRACE varDecs 
     {
+        
         printf("function %s.%s %d\n", classname, current_table->name, local_count);
+        if (subroutine == CONSTRUCTOR_KIND)
+        {
+            printf("push constant %d\n", field_count + static_count);
+            printf("call Memory.alloc 1\n");
+            printf("pop pointer 0\n");
+        }
+        else if (subroutine == METHOD_KIND)
+        {
+            printf("push argument 0\n");
+            printf("pop pointer 0\n");
+        }
+
     }
     statements RBRACE
 ;
@@ -362,9 +395,7 @@ ifStatement
     }
     | preif LBRACE statements RBRACE
     {
-        printf("goto IF_END%d\n", $<nval>1);
         printf("label IF_FALSE%d\n", $<nval>1);
-        printf("label IF_END%d\n", $<nval>1);
     }
 ;
 
@@ -468,7 +499,8 @@ subroutineCall
     }
     LPAR expressionList RPAR
     {
-        printf("call %s %d\n", $<lval>1.lex, arg_count);
+        printf("push pointer 0\n");
+        printf("call %s.%s %d\n", classname, $<lval>1.lex, arg_count+1);
     }
 
     | identifier DOT identifier 
@@ -477,7 +509,16 @@ subroutineCall
     }
     LPAR expressionList RPAR
     {
-        printf("call %s.%s %d\n", $<lval>1.lex, $<lval>3.lex, arg_count);
+        struct symbol* symbole = lookupTable($<lval>1.lex);
+        if (symbole != NULL)
+        {
+            printf ("push %s %d\n", kind_list[symbole->kind], symbole->num);
+            printf("call %s.%s %d\n", symbole->type_name, $<lval>3.lex, arg_count + 1);
+        }
+        else
+        {
+            printf("call %s.%s %d\n", $<lval>1.lex, $<lval>3.lex, arg_count);
+        }
     }
 ;
 
@@ -559,6 +600,10 @@ keywordConstant
     }
     | NULLVAL
     | THIS
+    {
+        //printf("%s\n", kind_list[position]);
+        printf("push pointer 0\n");
+    }
 ;
 
 empty 

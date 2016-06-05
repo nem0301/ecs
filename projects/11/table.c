@@ -12,7 +12,7 @@
 #define LOCAL_KIND 4
 #define CONSTRUCTOR_KIND 5
 #define FUNCTION_KIND 6
-#define METHOD_KIND 7;
+#define METHOD_KIND 7
 
 #define BOOLEAN_TYPE 0
 #define VOID_TYPE 1
@@ -23,7 +23,7 @@
 
 char *kind_list[] = {
     "class",
-    "field",
+    "this",
     "static",
     "argument",
     "local",
