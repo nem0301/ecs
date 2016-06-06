@@ -638,6 +638,9 @@ keywordConstant
         printf("push constant 0\n");
     }
     | NULLVAL
+    {
+        printf("push constant 0\n");
+    }
     | THIS
     {
         //printf("%s\n", kind_list[position]);

@@ -568,7 +568,7 @@ static const yytype_uint16 yyrline[] =
      449,   453,   461,   465,   469,   473,   484,   485,   490,   498,
      499,   500,   516,   522,   532,   531,   542,   541,   565,   569,
      573,   581,   585,   589,   593,   597,   601,   605,   609,   613,
-     620,   624,   631,   636,   640,   641,   648
+     620,   624,   631,   636,   640,   644,   651
 };
 #endif
 
@@ -2141,17 +2141,25 @@ yyreduce:
 #line 2142 "parser.tab.c" /* yacc.c:1646  */
     break;
 
+  case 94:
+#line 641 "parser.y" /* yacc.c:1646  */
+    {
+        printf("push constant 0\n");
+    }
+#line 2150 "parser.tab.c" /* yacc.c:1646  */
+    break;
+
   case 95:
-#line 642 "parser.y" /* yacc.c:1646  */
+#line 645 "parser.y" /* yacc.c:1646  */
     {
         //printf("%s\n", kind_list[position]);
         printf("push pointer 0\n");
     }
-#line 2151 "parser.tab.c" /* yacc.c:1646  */
+#line 2159 "parser.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2155 "parser.tab.c" /* yacc.c:1646  */
+#line 2163 "parser.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2379,7 +2387,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 662 "parser.y" /* yacc.c:1906  */
+#line 665 "parser.y" /* yacc.c:1906  */
 
 
 
