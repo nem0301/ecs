@@ -135,7 +135,7 @@ class
     {
         classname = (char*) malloc (strlen($<lval>3.lex) + 1);
         strcpy(classname, $<lval>3.lex);
-        insertTable ( global_table, classname, CLASS_KIND, CLASS_TYPE, 0, "");
+        //insertTable ( global_table, classname, CLASS_KIND, CLASS_TYPE, 0, "");
     }
     LBRACE classVarDecList subroutineDecList RBRACE
     {
@@ -239,7 +239,15 @@ subroutineDec
         insertTable(global_table, $<lval>3.lex, $<tval>1.type, $<tval>2.type, 0, lexeme);
         local_table = createTable($<lval>3.lex);
         current_table = local_table;
-        arg_count = 0;
+        if (subroutine == METHOD_KIND)
+        {
+            arg_count = 1;
+        }
+        else
+        {
+            arg_count = 0;
+        }
+
         local_count = 0;
         while_count = 0;
         if_count = 0;
@@ -302,7 +310,7 @@ subroutineBody :
         printf("function %s.%s %d\n", classname, current_table->name, local_count);
         if (subroutine == CONSTRUCTOR_KIND)
         {
-            printf("push constant %d\n", field_count + static_count);
+            printf("push constant %d\n", field_count);
             printf("call Memory.alloc 1\n");
             printf("pop pointer 0\n");
         }
@@ -522,24 +530,28 @@ stringConstant
 subroutineCall 
     : identifier 
     {
+        printf("push pointer 0\n");
         arg_count = 0;
     }
     LPAR expressionList RPAR
     {
-        printf("push pointer 0\n");
         printf("call %s.%s %d\n", classname, $<lval>1.lex, arg_count+1);
     }
 
     | identifier DOT identifier 
     {
         arg_count  = 0;
+        struct symbol* symbole = lookupTable($<lval>1.lex);
+        if (symbole != NULL)
+        {
+            printf ("push %s %d\n", kind_list[symbole->kind], symbole->num);
+        }
     }
     LPAR expressionList RPAR
     {
         struct symbol* symbole = lookupTable($<lval>1.lex);
         if (symbole != NULL)
         {
-            printf ("push %s %d\n", kind_list[symbole->kind], symbole->num);
             printf("call %s.%s %d\n", symbole->type_name, $<lval>3.lex, arg_count + 1);
         }
         else
